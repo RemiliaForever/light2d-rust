@@ -6,19 +6,14 @@ use image::ImageBuffer;
 use image::Rgb;
 use rayon::prelude::*;
 
-const WIDTH: u32 = 1920;
-const HEIGHT: u32 = 1080;
+mod chapter1;
 
-fn basic(x: f32, y: f32, _param: Vec<u8>) -> Rgb<u8> {
-    let red = (1.0 - x) * 255.0;
-    let green = x * 255.0;
-    let blue = y * 255.0;
-    Rgb([red as u8, green as u8, blue as u8])
-}
+const WIDTH: u32 = 1024;
+const HEIGHT: u32 = 1024;
 
 use std::time::SystemTime;
 use std::error::Error;
-fn gen(fun: fn(f32, f32, Vec<u8>) -> Rgb<u8>, path: &str) -> String {
+fn gen(fun: fn(f32, f32, Vec<u32>) -> Rgb<u8>, path: &str, param: Vec<u32>) -> String {
     let mut img: image::RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
     let start = SystemTime::now();
     let result: Vec<(u32, u32, Rgb<u8>)> = (0..WIDTH * HEIGHT)
@@ -28,7 +23,7 @@ fn gen(fun: fn(f32, f32, Vec<u8>) -> Rgb<u8>, path: &str) -> String {
             let y = point % HEIGHT;
             let xp = x as f32 / WIDTH as f32;
             let yp = y as f32 / HEIGHT as f32;
-            (x, y, fun(xp, yp, vec![]))
+            (x, y, fun(xp, yp, param.clone()))
         })
         .collect();
     let stop = SystemTime::now();
@@ -44,8 +39,6 @@ fn gen(fun: fn(f32, f32, Vec<u8>) -> Rgb<u8>, path: &str) -> String {
     }
 }
 
-
-
 fn main() {
-    println!("{} => {}", "basic", gen(basic, "./basic.png"));
+    chapter1::run();
 }
