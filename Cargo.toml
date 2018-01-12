@@ -1,0 +1,9 @@
+[package]
+name = "light2d"
+version = "0.1.0"
+authors = ["RemiliaForever <remilia@koumakan.cc>"]
+
+[dependencies]
+image = "0.18"
+rand = "0.4"
+rayon = "0.9"
