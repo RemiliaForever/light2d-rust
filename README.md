@@ -20,8 +20,8 @@ release编译，通过rayon启用多线程渲染，1024x1024分辨率，仅统�
 |**stratified sampling**|0.108399|0.361274|1.405259|5.554561|
 |**jittered sampling**|0.138914|0.477013|1.861866|7.377027|
 
-运行效果：
-![chapter1.png](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter1.png)
+运行缩略图：
+![chapter1.jpg](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter1.jpg)
 
 ## chapter 2
-![chapter2.png](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter2.png)
+![chapter2.jpg](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter2.jpg)
