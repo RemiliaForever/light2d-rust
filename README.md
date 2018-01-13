@@ -9,7 +9,7 @@
 * OS : ArchLinux
 * Rust: Rustc Nightly
 
-release编译，通过rayon启用多线程渲染，仅统计渲染所花时间。
+release编译，通过rayon启用多线程渲染，1024x1024分辨率，仅统计渲染所花时间。
 
 ## chapter 1
 运行时间:
@@ -21,4 +21,7 @@ release编译，通过rayon启用多线程渲染，仅统计渲染所花时间�
 |**jittered sampling**|0.138914|0.477013|1.861866|7.377027|
 
 运行效果：
-![chapter1.png](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter1.png) 
+![chapter1.png](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter1.png)
+
+## chapter 2
+![chapter2.png](https://github.com/RemiliaForever/light2d-rust/raw/master/img/chapter2.png)

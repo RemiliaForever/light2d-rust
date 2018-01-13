@@ -70,63 +70,63 @@ pub fn run() {
     println!(
         "{} => {}",
         "chapter1 uniform_sampling N=16",
-        gen(uniform_sampling, "./chapter1_1_1.png", vec![16])
+        gen(uniform_sampling, "./target/chapter1_1_1.png", vec![16])
     );
     println!(
         "{} => {}",
         "chapter1 uniform_sampling N=64",
-        gen(uniform_sampling, "./chapter1_1_2.png", vec![64])
+        gen(uniform_sampling, "./target/chapter1_1_2.png", vec![64])
     );
     println!(
         "{} => {}",
         "chapter1 uniform_sampling N=256",
-        gen(uniform_sampling, "./chapter1_1_3.png", vec![256])
+        gen(uniform_sampling, "./target/chapter1_1_3.png", vec![256])
     );
     println!(
         "{} => {}",
         "chapter1 uniform_sampling N=1024",
-        gen(uniform_sampling, "./chapter1_1_4.png", vec![1024])
+        gen(uniform_sampling, "./target/chapter1_1_4.png", vec![1024])
     );
     // stratified_sampling
     println!(
         "{} => {}",
         "chapter1 stratified_sampling N=16",
-        gen(stratified_sampling, "./chapter1_2_1.png", vec![16])
+        gen(stratified_sampling, "./target/chapter1_2_1.png", vec![16])
     );
     println!(
         "{} => {}",
         "chapter1 stratified_sampling N=64",
-        gen(stratified_sampling, "./chapter1_2_2.png", vec![64])
+        gen(stratified_sampling, "./target/chapter1_2_2.png", vec![64])
     );
     println!(
         "{} => {}",
         "chapter1 stratified_sampling N=256",
-        gen(stratified_sampling, "./chapter1_2_3.png", vec![256])
+        gen(stratified_sampling, "./target/chapter1_2_3.png", vec![256])
     );
     println!(
         "{} => {}",
         "chapter1 stratified_sampling N=1024",
-        gen(stratified_sampling, "./chapter1_2_4.png", vec![1024])
+        gen(stratified_sampling, "./target/chapter1_2_4.png", vec![1024])
     );
     // jittered_sampling
     println!(
         "{} => {}",
         "chapter1 jittered_sampling N=16",
-        gen(jittered_sampling, "./chapter1_3_1.png", vec![16])
+        gen(jittered_sampling, "./target/chapter1_3_1.png", vec![16])
     );
     println!(
         "{} => {}",
         "chapter1 jittered_sampling N=64",
-        gen(jittered_sampling, "./chapter1_3_2.png", vec![64])
+        gen(jittered_sampling, "./target/chapter1_3_2.png", vec![64])
     );
     println!(
         "{} => {}",
         "chapter1 jittered_sampling N=256",
-        gen(jittered_sampling, "./chapter1_3_3.png", vec![256])
+        gen(jittered_sampling, "./target/chapter1_3_3.png", vec![256])
     );
     println!(
         "{} => {}",
         "chapter1 jittered_sampling N=1024",
-        gen(jittered_sampling, "./chapter1_3_4.png", vec![1024])
+        gen(jittered_sampling, "./target/chapter1_3_4.png", vec![1024])
     );
 }

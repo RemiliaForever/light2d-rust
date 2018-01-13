@@ -7,6 +7,7 @@ use image::Rgb;
 use rayon::prelude::*;
 
 mod chapter1;
+mod chapter2;
 
 const WIDTH: u32 = 1024;
 const HEIGHT: u32 = 1024;
@@ -40,5 +41,6 @@ fn gen(fun: fn(f32, f32, Vec<u32>) -> Rgb<u8>, path: &str, param: Vec<u32>) -> S
 }
 
 fn main() {
-    chapter1::run();
+    // chapter1::run();
+    chapter2::run();
 }
