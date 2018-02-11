@@ -1,7 +1,8 @@
 use super::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Pixel {
-    pub point: Point,
+    pub x: u32,
+    pub y: u32,
     pub color: Color,
 }

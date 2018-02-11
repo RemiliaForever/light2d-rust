@@ -16,6 +16,7 @@ pub struct Scene {
     pub config: SceneConfig,
     pub width: u32,
     pub height: u32,
+    pub object: Circle,
 }
 impl Default for Scene {
     fn default() -> Scene {
@@ -23,6 +24,11 @@ impl Default for Scene {
             config: SceneConfig::default(),
             width: 1024,
             height: 1024,
+            object: Circle {
+                center: Point { x: 0.5, y: 0.5 },
+                radius: 0.2,
+                color: Color::new(511, 511, 511),
+            },
         }
     }
 }
@@ -40,28 +46,46 @@ impl Default for SceneConfig {
             max_step: 10,
             max_distance: 2.0,
             epsilon: 1e-6,
-            n_sampling: 256,
+            n_sampling: 512,
         }
     }
 }
 
 impl Scene {
-    pub fn jittered_sampling(&self, point: Point) -> Pixel {
-        let mut sum = 0.0;
+    pub fn trace(&self, mut light: Light) -> Color {
+        let mut distance = 0_f32;
+        let mut result = Color::new(0, 0, 0);
+        for _i in 0..self.config.max_step {
+            if distance >= self.config.max_distance {
+                break;
+            }
+            let sd = self.object.sdf(&light);
+            if sd < self.config.epsilon {
+                result = self.object.color();
+                break;
+            }
+            distance += sd;
+            light.trace(sd);
+        }
+        result
+    }
+    pub fn jittered_sampling(&self, mut pixel: Pixel) -> Pixel {
+        let mut sum = Color::new(0, 0, 0);
         let mut rng = rand::thread_rng();
+        let point: Point = Point {
+            x: pixel.x as f32 / self.width as f32,
+            y: pixel.y as f32 / self.height as f32,
+        };
         for i in 0..self.config.n_sampling {
-            let a = PI * 2.0 * (i as f32 + rng.gen::<f32>()) / self.config.n_sampling as f32;
-            sum += Light::trace().red as f32;
+            let theta = PI * 2_f32 * (i as f32 + rng.gen::<f32>()) / self.config.n_sampling as f32;
+            let light = Light {
+                start: point.clone(),
+                direction: Vector::from_theta(theta),
+            };
+            sum = sum + self.trace(light);
         }
-        let grey = (sum / self.config.n_sampling as f32 * 255.0) as u8;
-        Pixel {
-            point: point,
-            color: Color {
-                red: grey,
-                green: grey,
-                blue: grey,
-            },
-        }
+        pixel.color = sum / self.config.n_sampling;
+        pixel
     }
 
     pub fn render(&self) -> RgbImage {
@@ -70,18 +94,17 @@ impl Scene {
         let result: Vec<Pixel> = (0..self.width * self.height)
             .into_par_iter()
             .map(|index: u32| {
-                let x = index / self.width;
-                let y = index % self.height;
-                let point = Point {
-                    x: x as f32,
-                    y: y as f32,
+                let pixel = Pixel {
+                    x: index % self.width,
+                    y: index / self.width,
+                    color: Color::new(0, 0, 0),
                 };
-                self.jittered_sampling(point)
+                self.jittered_sampling(pixel)
             })
             .collect();
         let stop = SystemTime::now();
         for p in result {
-            img.put_pixel(p.point.x as u32, p.point.y as u32, p.color.rgb());
+            img.put_pixel(p.x as u32, p.y as u32, p.color.rgb());
         }
         match stop.duration_since(start) {
             Ok(d) => {

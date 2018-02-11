@@ -7,11 +7,8 @@ pub struct Light {
 }
 
 impl Light {
-    pub fn trace() -> Color {
-        Color {
-            red: 255,
-            green: 255,
-            blue: 255,
-        }
+    pub fn trace(&mut self, distance: f32) {
+        self.start.x += distance * self.direction.x;
+        self.start.y += distance * self.direction.y;
     }
 }
