@@ -23,7 +23,10 @@ impl Color {
         }
     }
     pub fn rgb(&self) -> Rgb<u8> {
-        Rgb([self.red as u8, self.green as u8, self.blue as u8])
+        fn to_u8(color: u32) -> u8 {
+            if color > 255 { 255 } else { color as u8 }
+        }
+        Rgb([to_u8(self.red), to_u8(self.green), to_u8(self.blue)])
     }
 }
 impl Add for Color {

@@ -40,20 +40,26 @@ mod tests {
             self.color.clone()
         }
     }
+
     #[test]
     fn test() {
         let mut scene = Scene::default();
         scene.object.push(Box::new(Circle {
-            center: Point { x: 0.5, y: 0.5 },
-            radius: 0.05,
-            color: Color::new(511, 511, 511),
+            center: Point { x: 0.4, y: 0.5 },
+            radius: 0.1,
+            color: Color::new(511, 0, 0),
         }));
         scene.object.push(Box::new(Circle {
-            center: Point { x: 0.8, y: 0.8 },
-            radius: 0.02,
-            color: Color::new(255, 255, 255),
+            center: Point { x: 0.5, y: 0.5 },
+            radius: 0.1,
+            color: Color::new(0, 0, 511),
         }));
-        match scene.render().save("./1.jpg") {
+        scene.object.push(Box::new(Circle {
+            center: Point { x: 0.6, y: 0.5 },
+            radius: 0.1,
+            color: Color::new(0, 1023, 0),
+        }));
+        match scene.render().save("./1.png") {
             Err(e) => println!("save error: {}", e.description()),
             _ => {}
         }
