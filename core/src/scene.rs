@@ -11,12 +11,11 @@ use rayon::prelude::*;
 
 use super::*;
 
-#[derive(Debug)]
 pub struct Scene {
     pub config: SceneConfig,
     pub width: u32,
     pub height: u32,
-    pub object: Circle,
+    pub object: Vec<Box<Object + Sync>>,
 }
 impl Default for Scene {
     fn default() -> Scene {
@@ -24,11 +23,7 @@ impl Default for Scene {
             config: SceneConfig::default(),
             width: 1024,
             height: 1024,
-            object: Circle {
-                center: Point { x: 0.5, y: 0.5 },
-                radius: 0.2,
-                color: Color::new(511, 511, 511),
-            },
+            object: Vec::new(),
         }
     }
 }
@@ -59,10 +54,16 @@ impl Scene {
             if distance >= self.config.max_distance {
                 break;
             }
-            let sd = self.object.sdf(&light);
-            if sd < self.config.epsilon {
-                result = self.object.color();
-                break;
+            let mut sd = std::f32::MAX;
+            for _object in &self.object {
+                let p_sd = _object.sdf(&light);
+                if sd > p_sd {
+                    sd = p_sd;
+                    if p_sd < self.config.epsilon {
+                        result = _object.color();
+                        break;
+                    }
+                }
             }
             distance += sd;
             light.trace(sd);
