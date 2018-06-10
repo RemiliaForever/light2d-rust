@@ -1,43 +1,46 @@
-extern crate image;
-extern crate rayon;
-extern crate rand;
+extern crate core;
 
-use image::ImageBuffer;
-use image::Rgb;
-use rayon::prelude::*;
-
-const WIDTH: u32 = 1024;
-const HEIGHT: u32 = 1024;
-
-use std::time::SystemTime;
 use std::error::Error;
-fn gen(fun: fn(f32, f32, Vec<u32>) -> Rgb<u8>, path: &str, param: Vec<u32>) -> String {
-    let mut img: image::RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    let start = SystemTime::now();
-    let result: Vec<(u32, u32, Rgb<u8>)> = (0..WIDTH * HEIGHT)
-        .into_par_iter()
-        .map(|point: u32| {
-            let x = point / HEIGHT;
-            let y = point % HEIGHT;
-            let xp = x as f32 / WIDTH as f32;
-            let yp = y as f32 / HEIGHT as f32;
-            (x, y, fun(xp, yp, param.clone()))
-        })
-        .collect();
-    let stop = SystemTime::now();
-    for p in result {
-        img.put_pixel(p.0, p.1, p.2);
+
+use core::{Color, Light, Object, Point, Scene};
+
+#[derive(Debug)]
+struct Circle {
+    pub center: Point,
+    pub radius: f32,
+    pub color: Color,
+}
+
+impl Object for Circle {
+    fn sdf(&self, light: &Light) -> f32 {
+        let ux = self.center.x - light.start.x;
+        let uy = self.center.y - light.start.y;
+        (ux * ux + uy * uy).sqrt() - self.radius
     }
-    match img.save(path) {
-        Ok(()) => match stop.duration_since(start) {
-            Ok(d) => format!("cost: {:.6} s", d.as_secs() as f64 + d.subsec_nanos() as f64 * 1e-9),
-            Err(e) => format!("error: {}", e.description())
-        },
-        Err(e) => format!("error: {}", e.description()),
+    fn color(&self) -> Color {
+        self.color.clone()
     }
 }
 
 fn main() {
-    // chapter1::run();
-    // chapter2::run();
+    let mut scene = Scene::default();
+    scene.object.push(Box::new(Circle {
+        center: Point { x: 0.4, y: 0.5 },
+        radius: 0.1,
+        color: Color::new(511, 0, 0),
+    }));
+    scene.object.push(Box::new(Circle {
+        center: Point { x: 0.6, y: 0.5 },
+        radius: 0.1,
+        color: Color::new(0, 1023, 0),
+    }));
+    scene.object.push(Box::new(Circle {
+        center: Point { x: 0.5, y: 0.5 },
+        radius: 0.1,
+        color: Color::new(0, 0, 511),
+    }));
+    match scene.render().save("./1.png") {
+        Err(e) => println!("save error: {}", e.description()),
+        _ => {}
+    }
 }

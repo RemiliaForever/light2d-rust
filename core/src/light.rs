@@ -7,6 +7,13 @@ pub struct Light {
 }
 
 impl Light {
+    pub fn from_theta(start: &Point, theta: f32) -> Light {
+        Light {
+            start: start.clone(),
+            direction: Vector::from_theta(theta),
+        }
+    }
+
     pub fn trace(&mut self, distance: f32) {
         self.start.x += distance * self.direction.x;
         self.start.y += distance * self.direction.y;
