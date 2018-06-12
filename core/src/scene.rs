@@ -11,16 +11,15 @@ use super::*;
 
 pub struct Scene {
     pub config: SceneConfig,
-    pub width: u32,
-    pub height: u32,
+    pub size: u32,
     pub object: Vec<Box<Object + Sync>>,
 }
+
 impl Default for Scene {
     fn default() -> Scene {
         Scene {
             config: SceneConfig::default(),
-            width: 1024,
-            height: 1024,
+            size: 1024,
             object: Vec::new(),
         }
     }
@@ -29,16 +28,13 @@ impl Default for Scene {
 #[derive(Debug)]
 pub struct SceneConfig {
     pub max_step: u32,
-    pub max_distance: f32,
-    pub epsilon: f32,
     pub n_sampling: u32,
 }
+
 impl Default for SceneConfig {
     fn default() -> SceneConfig {
         SceneConfig {
             max_step: 10,
-            max_distance: 2.0,
-            epsilon: 1e-6,
             n_sampling: 512,
         }
     }
@@ -46,33 +42,41 @@ impl Default for SceneConfig {
 
 impl Scene {
     pub fn trace(&self, mut light: Light) -> Color {
-        let mut distance = 0_f32;
-        let mut result = Color::new(0, 0, 0);
-        for _i in 0..self.config.max_step {
-            if distance >= self.config.max_distance {
-                break;
-            }
-            let mut sd = std::f32::MAX;
-            for _object in &self.object {
-                let p_sd = _object.sdf(&light);
-                if sd > p_sd {
-                    sd = p_sd;
-                    if p_sd < self.config.epsilon {
-                        result = _object.color();
-                        break;
+        fn trace_once(mut light: Light, mut weight: f32) -> Color {
+            // calc reflect
+            //
+            // calc refrac
+            //
+            Color::new(0, 0, 0)
+        }
+        let mut result: (Option<&Box<Object + Sync>>, Option<Point>, Option<f32>) =
+            (None, None, None);
+        (&self.object).into_iter().for_each(|x| {
+            match x.collision(&light) {
+                (Some(p), Some(d)) => {
+                    if let Some(od) = result.2 {
+                        if d <= od {
+                            result = (Some(x), Some(p), Some(d));
+                        }
+                    } else {
+                        result = (Some(x), Some(p), Some(d));
                     }
                 }
-            }
-            distance += sd;
-            light.trace(sd);
+                _ => return,
+            };
+        });
+        if let Some(object) = result.0 {
+            object.color()
+        } else {
+            Color::new(0, 0, 0)
         }
-        result
     }
+
     pub fn jittered_sampling(&self, mut pixel: Pixel) -> Pixel {
         let mut rng = rand::thread_rng();
         let point: Point = Point {
-            x: pixel.x as f32 / self.width as f32,
-            y: pixel.y as f32 / self.height as f32,
+            x: pixel.x as f32 / self.size as f32,
+            y: pixel.y as f32 / self.size as f32,
         };
         pixel.color = (0..self.config.n_sampling)
             .map(|x| {
@@ -87,14 +91,14 @@ impl Scene {
     }
 
     pub fn render(&self) -> RgbImage {
-        let mut img: RgbImage = ImageBuffer::new(self.width, self.height);
+        let mut img: RgbImage = ImageBuffer::new(self.size, self.size);
         let start = SystemTime::now();
-        let result: Vec<Pixel> = (0..self.width * self.height)
+        let result: Vec<Pixel> = (0..self.size * self.size)
             .into_par_iter()
             .map(|index: u32| {
                 let pixel = Pixel {
-                    x: index % self.width,
-                    y: index / self.width,
+                    x: index % self.size,
+                    y: index / self.size,
                     color: Color::new(0, 0, 0),
                 };
                 self.jittered_sampling(pixel)

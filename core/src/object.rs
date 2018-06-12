@@ -1,6 +1,6 @@
 use super::*;
 
 pub trait Object {
-    fn sdf(&self, &Light) -> f32;
+    fn collision(&self, light: &Light) -> (Option<Point>, Option<f32>);
     fn color(&self) -> Color;
 }
