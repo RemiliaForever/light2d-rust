@@ -1,5 +1,5 @@
 use super::*;
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 #[derive(Debug, Clone)]
 pub struct Point {
@@ -15,5 +15,13 @@ impl Add<Vector> for Point {
             x: self.x + v.x,
             y: self.y + v.y,
         }
+    }
+}
+
+impl Sub for Point {
+    type Output = Vector;
+
+    fn sub(self, s: Point) -> Vector {
+        Vector::new(self.x - s.x, self.y - s.y)
     }
 }
