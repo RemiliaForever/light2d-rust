@@ -18,9 +18,9 @@ impl Color {
     }
     pub fn from_f32(r: f32, g: f32, b: f32) -> Color {
         Color {
-            red: (r * 255_f32) as u32,
-            green: (g * 255_f32) as u32,
-            blue: (b * 255_f32) as u32,
+            red: (r * 255.0) as u32,
+            green: (g * 255.0) as u32,
+            blue: (b * 255.0) as u32,
         }
     }
     pub fn rgb(&self) -> Rgb<u8> {

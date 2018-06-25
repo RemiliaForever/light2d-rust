@@ -41,13 +41,9 @@ impl Default for SceneConfig {
 }
 
 impl Scene {
-    pub fn trace(&self, mut light: Light) -> Color {
-        fn trace_once(mut light: Light, mut weight: f32) -> Color {
-            // calc reflect
-            //
-            // calc refrac
-            //
-            Color::new(0, 0, 0)
+    fn trace(&self, light: Light, weight: f32, depth: u32) -> (f32, f32, f32) {
+        if depth >= 10 || weight <= 0.0 {
+            return (0.0, 0.0, 0.0);
         }
         let mut result: (Option<&Box<Object + Sync>>, Option<Point>, Option<f32>) =
             (None, None, None);
@@ -65,10 +61,32 @@ impl Scene {
                 _ => return,
             };
         });
-        if let Some(object) = result.0 {
-            object.color()
-        } else {
-            Color::new(0, 0, 0)
+        match result {
+            (Some(object), Some(point), Some(distance)) => {
+                let color = object.color();
+                let mut tmp = (color.red as f32, color.green as f32, color.blue as f32);
+
+                // reflect
+                let normal = object.normal(point.clone());
+                let incoming = light.direction.clone();
+                let projection = incoming.clone() * normal.clone();
+                if projection < 0.0 {
+                    let reflect = Light {
+                        start: point,
+                        direction: incoming - 2.0 * projection * normal,
+                    };
+                    let r = self.trace(reflect, object.ior(), depth + 1);
+                    tmp.0 += r.0;
+                    tmp.1 += r.1;
+                    tmp.2 += r.2;
+                }
+                // refract
+                tmp.0 *= weight;
+                tmp.1 *= weight;
+                tmp.2 *= weight;
+                tmp
+            }
+            _ => (0.0, 0.0, 0.0),
         }
     }
 
@@ -83,7 +101,8 @@ impl Scene {
                 let theta =
                     PI * 2_f32 * (x as f32 + rng.gen::<f32>()) / self.config.n_sampling as f32;
                 let light = Light::from_theta(&point, theta);
-                self.trace(light)
+                let c = self.trace(light, 1.0, 0);
+                Color::new(c.0 as u32, c.1 as u32, c.2 as u32)
             })
             .collect::<Vec<Color>>()
             .avg();
