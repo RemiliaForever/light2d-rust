@@ -12,6 +12,7 @@ impl Vector {
         v.normalize();
         v
     }
+
     pub fn from_theta(theta: f32) -> Vector {
         Vector {
             x: theta.cos(),
@@ -19,6 +20,7 @@ impl Vector {
         }
     }
 
+    #[inline]
     pub fn magnitude(&self) -> f32 {
         self.x * self.x + self.y * self.y
     }
@@ -30,7 +32,7 @@ impl Vector {
     }
 
     pub fn normalize(&mut self) {
-        let scale = self.x * self.x + self.y * self.y;
+        let scale = self.magnitude().sqrt();
         self.x = self.x / scale;
         self.y = self.y / scale;
     }
@@ -38,7 +40,6 @@ impl Vector {
 
 impl Add for Vector {
     type Output = Self;
-
     fn add(self, rhs: Self) -> Self {
         Vector {
             x: self.x + rhs.x,
@@ -49,7 +50,6 @@ impl Add for Vector {
 
 impl Sub for Vector {
     type Output = Self;
-
     fn sub(self, rhs: Self) -> Self {
         Vector {
             x: self.x - rhs.x,
@@ -60,7 +60,7 @@ impl Sub for Vector {
 
 impl Mul for Vector {
     type Output = f32;
-
+    #[inline]
     fn mul(self, rhs: Self) -> f32 {
         self.x * rhs.x + self.y * rhs.y
     }
@@ -68,7 +68,6 @@ impl Mul for Vector {
 
 impl Div<f32> for Vector {
     type Output = Self;
-
     fn div(self, rhs: f32) -> Self {
         Vector {
             x: self.x / rhs,
@@ -79,7 +78,6 @@ impl Div<f32> for Vector {
 
 impl Mul<f32> for Vector {
     type Output = Self;
-
     fn mul(self, rhs: f32) -> Self {
         Vector {
             x: self.x * rhs,
@@ -90,7 +88,6 @@ impl Mul<f32> for Vector {
 
 impl Mul<Vector> for f32 {
     type Output = Vector;
-
     fn mul(self, vec: Vector) -> Vector {
         Vector {
             x: vec.x * self,

@@ -22,6 +22,9 @@ impl Sub for Point {
     type Output = Vector;
 
     fn sub(self, s: Point) -> Vector {
-        Vector::new(self.x - s.x, self.y - s.y)
+        Vector {
+            x:self.x - s.x,
+            y:self.y - s.y
+        }
     }
 }

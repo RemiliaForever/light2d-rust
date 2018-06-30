@@ -13,9 +13,4 @@ impl Light {
             direction: Vector::from_theta(theta),
         }
     }
-
-    pub fn trace(&mut self, distance: f32) {
-        self.start.x += distance * self.direction.x;
-        self.start.y += distance * self.direction.y;
-    }
 }

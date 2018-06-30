@@ -27,21 +27,15 @@ fn main() {
     //    ior: std::f32::MAX,
     //}));
     scene.object.push(Box::new(Circle {
-        center: Point { x: 0.5, y: 0.0 },
-        radius: 0.1,
-        color: Color::new(511, 511, 511),
-        ior: 0.0,
-    }));
-    scene.object.push(Box::new(Circle {
-        center: Point { x: 0.5, y: 0.5 },
-        radius: 0.1,
+        center: Point { x: 0.5, y: -9.5 },
+        radius: 10.0,
         color: Color::new(0, 0, 0),
         ior: 1.0,
     }));
     scene.object.push(Box::new(Circle {
-        center: Point { x: 0.5, y: 0.8 },
+        center: Point { x: 0.5, y: 0.65 },
         radius: 0.1,
-        color: Color::new(255, 255, 255),
+        color: Color::new(511, 511, 511),
         ior: 0.0,
     }));
     match scene.render().save("./1.png") {

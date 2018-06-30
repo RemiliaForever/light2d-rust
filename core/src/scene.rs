@@ -4,7 +4,8 @@ use std::f32::consts::PI;
 use std::time::SystemTime;
 
 use image::{ImageBuffer, RgbImage};
-use rand::{self, Rng};
+use rand::rngs::SmallRng;
+use rand::{self, FromEntropy, Rng};
 use rayon::prelude::*;
 
 use super::*;
@@ -62,18 +63,18 @@ impl Scene {
             };
         });
         match result {
-            (Some(object), Some(point), Some(distance)) => {
-                let color = object.color();
-                let mut tmp = (color.red as f32, color.green as f32, color.blue as f32);
-
+            (Some(object), Some(point), Some(_distance)) => {
+                let color: Color = object.color();
+                let mut tmp: (f32, f32, f32) =
+                    (color.red as f32, color.green as f32, color.blue as f32);
                 // reflect
-                let normal = object.normal(point.clone());
-                let incoming = light.direction.clone();
-                let projection = incoming.clone() * normal.clone();
+                let normal: Vector = object.normal(point.clone());
+                let incoming: Vector = light.direction.clone();
+                let projection: f32 = incoming.clone() * normal.clone();
                 if projection < 0.0 {
                     let reflect = Light {
                         start: point,
-                        direction: incoming - 2.0 * projection * normal,
+                        direction: (incoming - 2.0 * projection * normal).normalvec(),
                     };
                     let r = self.trace(reflect, object.ior(), depth + 1);
                     tmp.0 += r.0;
@@ -90,23 +91,27 @@ impl Scene {
         }
     }
 
-    pub fn jittered_sampling(&self, mut pixel: Pixel) -> Pixel {
-        let mut rng = rand::thread_rng();
+    pub fn jittered_sampling(&self, x: u32, y: u32) -> Pixel {
+        let mut rng = SmallRng::from_entropy();
         let point: Point = Point {
-            x: pixel.x as f32 / self.size as f32,
-            y: pixel.y as f32 / self.size as f32,
+            x: x as f32 / self.size as f32,
+            y: y as f32 / self.size as f32,
         };
-        pixel.color = (0..self.config.n_sampling)
+        let color = (0..self.config.n_sampling)
             .map(|x| {
-                let theta =
+                let theta: f32 =
                     PI * 2_f32 * (x as f32 + rng.gen::<f32>()) / self.config.n_sampling as f32;
-                let light = Light::from_theta(&point, theta);
-                let c = self.trace(light, 1.0, 0);
+                let light: Light = Light::from_theta(&point, theta);
+                let c: (f32, f32, f32) = self.trace(light, 1.0, 0);
                 Color::new(c.0 as u32, c.1 as u32, c.2 as u32)
             })
             .collect::<Vec<Color>>()
             .avg();
-        pixel
+        Pixel {
+            x: x,
+            y: y,
+            color: color,
+        }
     }
 
     pub fn render(&self) -> RgbImage {
@@ -114,19 +119,12 @@ impl Scene {
         let start = SystemTime::now();
         let result: Vec<Pixel> = (0..self.size * self.size)
             .into_par_iter()
-            .map(|index: u32| {
-                let pixel = Pixel {
-                    x: index % self.size,
-                    y: index / self.size,
-                    color: Color::new(0, 0, 0),
-                };
-                self.jittered_sampling(pixel)
-            })
+            .map(|index: u32| self.jittered_sampling(index % self.size, index / self.size))
             .collect();
         let stop = SystemTime::now();
-        for p in result {
-            img.put_pixel(p.x as u32, p.y as u32, p.color.rgb());
-        }
+        result
+            .into_iter()
+            .for_each(|p| img.put_pixel(p.x as u32, p.y as u32, p.color.rgb()));
         match stop.duration_since(start) {
             Ok(d) => println!(
                 "rendering cost {:.6}s",
