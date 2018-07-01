@@ -4,8 +4,7 @@ use std::f32::consts::PI;
 use std::time::SystemTime;
 
 use image::{ImageBuffer, RgbImage};
-use rand::rngs::SmallRng;
-use rand::{self, FromEntropy, Rng};
+use rand::{rngs::SmallRng, FromEntropy, Rng};
 use rayon::prelude::*;
 
 use super::*;
@@ -68,7 +67,7 @@ impl Scene {
                 let mut tmp: (f32, f32, f32) =
                     (color.red as f32, color.green as f32, color.blue as f32);
                 // reflect
-                let normal: Vector = object.normal(point.clone());
+                let normal: Vector = object.normal(&point);
                 let incoming: Vector = light.direction.clone();
                 let projection: f32 = incoming.clone() * normal.clone();
                 if projection < 0.0 {

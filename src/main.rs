@@ -8,6 +8,11 @@ use circle::Circle;
 
 fn main() {
     let mut scene = Scene::default();
+
+    #[cfg(debug_assertions)]
+    {
+        scene.size = 32;
+    }
     //scene.object.push(Box::new(Circle {
     //    center: Point { x: 0.2, y: 0.2 },
     //    radius: 0.1,

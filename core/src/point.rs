@@ -9,7 +9,6 @@ pub struct Point {
 
 impl Add<Vector> for Point {
     type Output = Point;
-
     fn add(self, v: Vector) -> Point {
         Point {
             x: self.x + v.x,
@@ -20,11 +19,20 @@ impl Add<Vector> for Point {
 
 impl Sub for Point {
     type Output = Vector;
-
     fn sub(self, s: Point) -> Vector {
         Vector {
-            x:self.x - s.x,
-            y:self.y - s.y
+            x: self.x - s.x,
+            y: self.y - s.y,
+        }
+    }
+}
+
+impl<'a, 'b> Sub<&'a Point> for &'b Point {
+    type Output = Vector;
+    fn sub(self, s: &Point) -> Vector {
+        Vector {
+            x: self.x - s.x,
+            y: self.y - s.y,
         }
     }
 }

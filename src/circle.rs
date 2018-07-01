@@ -12,7 +12,7 @@ pub struct Circle {
 
 impl Object for Circle {
     fn collision(&self, light: &Light) -> (Option<Point>, Option<f32>) {
-        let vlr: Vector = self.center.clone() - light.start.clone();
+        let vlr: Vector = &self.center - &light.start;
         if vlr.magnitude().sqrt() < self.radius {
             return (Some(Point { x: 0.0, y: 0.0 }), Some(-1.0));
         }
@@ -37,8 +37,8 @@ impl Object for Circle {
         self.color.clone()
     }
 
-    fn normal(&self, point: Point) -> Vector {
-        (point - self.center.clone()).normalvec()
+    fn normal(&self, point: &Point) -> Vector {
+        (point - &self.center).normalvec()
     }
 
     fn ior(&self) -> f32 {
